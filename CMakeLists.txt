@@ -166,10 +166,7 @@ link_libraries(LuminoMath_Static)
 add_library(${PROJECT_NAME}_Static STATIC ${LN_SOURCES})
 set_target_properties(${PROJECT_NAME}_Static PROPERTIES OUTPUT_NAME ${LN_STATIC_LIB_OUTPUT_NAME})
 target_link_libraries(${PROJECT_NAME}_Static ${LN_LINK_LIBS})
-add_custom_command(
-	TARGET ${PROJECT_NAME}_Static
-	POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}_Static> "${PROJECT_SOURCE_DIR}/lib")
+add_custom_command(TARGET ${PROJECT_NAME}_Static POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}_Static> "${PROJECT_SOURCE_DIR}/lib")
 
 # Unit test.
 #add_subdirectory(test)
