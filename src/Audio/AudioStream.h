@@ -1,5 +1,5 @@
 /*
-	@file	AudioSource.h
+	@file	AudioStream.h
 */
 #pragma once
 
@@ -25,45 +25,45 @@ protected:
 public:
 
 	/// ファイルフォーマットの取得
-	virtual StreamFormat getSourceFormat() const = 0;
+	virtual StreamFormat GetSourceFormat() const = 0;
 
 	/// PCM フォーマットの取得
-	virtual const WaveFormat* getWaveFormat() const = 0;
+	virtual const WaveFormat* GetWaveFormat() const = 0;
 
 	/// 元データのサイズの取得 ( ストリーミング再生での終了判定等で使う )
-	virtual uint32_t getSourceDataSize() const = 0;
+	virtual uint32_t GetSourceDataSize() const = 0;
 
 	/// 全体の再生時間の取得 ( ミリ秒。後で無くなるかも )
-	virtual uint32_t getTotalTime() const = 0;
+	//virtual uint32_t getTotalTime() const = 0;
 
 	/// 全体のサンプル数の取得 ( Midi の場合はミュージックタイム単位 )
-	virtual uint32_t getTotalUnits() const = 0;
+	virtual uint32_t GetTotalUnits() const = 0;
 
 	/// オンメモリ再生用のバッファの先頭アドレス取得 ( fillBufferAndReleaseStream() を呼んでいない場合は NULL )
-	virtual byte_t* getOnmemoryPCMBuffer() const = 0;
+	virtual byte_t* GetOnmemoryPCMBuffer() const = 0;
 
 	/// オンメモリ再生時の全バッファサイズの取得
-	virtual uint32_t getOnmemoryPCMBufferSize() const = 0;
+	virtual uint32_t GetOnmemoryPCMBufferSize() const = 0;
 
-	/// 1 秒分のソースデータをデコードしたときの、最適なバイト数の取得
+	/// 1 秒分のソースデータをデコードするときの、最適なバイト数の取得
 	///	
 	///	通常は PCM フォーマットから取得できるけど、MP3 の場合は
 	///	API の都合(?)上、デコードに最適な 1 秒分のサイズは、普通のPCMのそれとは異なる。
 	///	そのため、ちゃんとチェックできるようにこのメソッドを用意。
 	///	いまのところは MP3 に限った話だけど、GetWaveFormat() で
 	///	取得した値から 1 秒分のサイズを計算するとバグので注意。
-	virtual uint32_t getBytesPerSec() const = 0;
+	virtual uint32_t GetBytesPerSec() const = 0;
 
 	/// ループ開始位置と終了位置の取得
 	///
 	///	Midi ファイルの場合は最初の CC111 位置のデルタタイムとベースタイム
-	virtual void getLoopState(uint32_t* begin, uint32_t* length) const = 0;
+	virtual void GetLoopState(uint32_t* begin, uint32_t* length) const = 0;
 
 	/// オーディオファイルとして扱うストリームを設定する
 	///
 	///	受け取ったストリームは参照カウントがひとつ増え、
 	///	インスタンスが解放されるか fillBuffer() が呼ばれるまで保持されます。
-	virtual void setStream(Stream* stream) = 0;
+	//virtual void setStream(Stream* stream) = 0;
 
 
 	/// オンメモリ再生用に全てのデータを読み込む
@@ -78,7 +78,9 @@ public:
 	/// <br>
 	/// 呼出し後、ストリームは解放され、このオーディオソースは
 	/// ストリーミング再生には使用できなくなります。<br>
-	virtual void fillBufferAndReleaseStream() = 0;
+	//virtual void fillBufferAndReleaseStream() = 0;
+	/// ※スレッドセーフで実装する
+	virtual void FillOnmemoryBuffer() = 0;
 
 	//----------------------------------------------------------------------
 	///**
@@ -103,32 +105,33 @@ public:
 	//              になります。	
 	//*/
 	//----------------------------------------------------------------------
-	virtual void read(void* buffer, lnU32 buffer_size, lnU32* out_read_size, lnU32* out_write_size);
+	/// ※スレッドセーフで実装する
+	virtual void Read(uint32_t seekPos, void* buffer, uint32_t buffer_size, uint32_t* out_read_size, uint32_t* out_write_size) = 0;
 
 	/// ファイルポインタ移動 (先頭からのバイトオフセット)
 	/// (このクラスで実装している read() と seek() は getOnmemoryPCMBuffer() に読み込んでいる事が前提)
-	virtual void seek(lnU32 offset);
+	//virtual void seek(uint32_t offset);
 
 	/// デコード状態のリセット(再生開始直前に呼ばれる。MP3 用)
-	virtual void reset() = 0;
+	virtual void Reset() = 0;
 
 
 
-	/// fillBufferAndReleaseStream() スレッドセーフ
-	virtual void fillBufferSafe()
-	{
-		// TODO: fillBufferAndReleaseStream() を直接読んでるところないかチェック
-		Threading::ScopedLock lock(mMutex);
-		this->fillBufferAndReleaseStream();
-	}
+	///// fillBufferAndReleaseStream() スレッドセーフ
+	//virtual void fillBufferSafe()
+	//{
+	//	// TODO: fillBufferAndReleaseStream() を直接読んでるところないかチェック
+	//	Threading::ScopedLock lock(mMutex);
+	//	this->fillBufferAndReleaseStream();
+	//}
 
-	/// seek + reed + スレッドセーフ
-	virtual void readSafe(void* buffer, lnU32 buffer_size, lnU32 offset, lnU32* read_size, lnU32* write_size)
-	{
-		Threading::ScopedLock lock(mMutex);
-		this->seek(offset);
-		this->read(buffer, buffer_size, read_size, write_size);
-	}
+	///// seek + reed + スレッドセーフ
+	//virtual void readSafe(void* buffer, uint32_t buffer_size, uint32_t offset, uint32_t* read_size, uint32_t* write_size)
+	//{
+	//	Threading::ScopedLock lock(mMutex);
+	//	this->seek(offset);
+	//	this->read(buffer, buffer_size, read_size, write_size);
+	//}
 };
 
 } // namespace Audio
