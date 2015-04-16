@@ -35,12 +35,13 @@ private:
 	Stream*			mInStream;				///< 入力ストリーム
 	WaveFormat		mWaveFormat;			///< PCM 用フォーマット
 	uint32_t		mSourceDataSize;		///< 音声データ部分のサイズ
-	uint32_t		mDataOffset;			///< ストリーム内の PCM データの先頭までのオフセットバイト数
+	uint64_t		mDataOffset;			///< ストリーム内の PCM データの先頭までのオフセットバイト数
 	uint32_t		mPCMDataSize;			///< ストリーム内の PCM データのサイズ
 	uint32_t		mTotalTime;				///< 全体の再生時間 ( ミリ秒 )
 	uint8_t*		mOnmemoryPCMBuffer;		///< オンメモリ再生用のデータを読み込むバッファ
 	uint32_t		mOnmemoryPCMBufferSize;	///< mOnmemoryPCMBuffer のサイズ ( 今のところ mDataOffset と同じ )
 	uint32_t		mTotalSamples;          ///< 全体の再生サンプル数
+	Threading::Mutex	m_mutex;
 
 };
 

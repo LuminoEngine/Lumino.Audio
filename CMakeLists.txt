@@ -139,6 +139,9 @@ set(LN_SOURCES
 	external/libvorbis/lib/vorbisenc.c
 	external/libvorbis/lib/vorbisfile.c
 	external/libvorbis/lib/window.c
+	src/Audio/AudioDevice.cpp
+	src/Audio/AudioStream.cpp
+	src/Audio/WaveStream.cpp
 	${LN_PLATFORM_SOURCES})
 	
 set(LN_INCLUDE_DIRECTORIES
