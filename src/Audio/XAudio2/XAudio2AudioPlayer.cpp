@@ -1,5 +1,5 @@
 ﻿
-//#include "stdafx.h"
+#include "../Internal.h"
 //#include "../../AudioUtil.h"
 //#include "../../Resource/AudioSource.h"
 #include <Lumino/Base/Exception.h>
@@ -13,9 +13,9 @@ namespace Lumino
 namespace Audio
 {
 
-//==============================================================================
+//=============================================================================
 // XAudio2AudioPlayerBase 
-//==============================================================================
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 //
@@ -440,8 +440,6 @@ void XAudio2StreamingAudioPlayer::stop()
 //-----------------------------------------------------------------------------
 void XAudio2StreamingAudioPlayer::pause( bool isPause )
 {
-	HRESULT hr;
-
 	// 再生中の場合
 	if ( mSourceVoice && mIsPlaying )
 	{

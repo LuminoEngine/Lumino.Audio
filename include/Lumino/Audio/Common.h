@@ -3,6 +3,7 @@
 */
 #pragma once
 
+#include <Lumino/Math/Vector3.h>
 #include <Lumino/Base/Common.h>
 
 namespace Lumino
@@ -65,6 +66,22 @@ enum SoundPlayState
 	SoundPlayState_Pausing,			///< 一時停止中
 
 	SoundPlayState_Max,
+};
+
+/// 3D サウンドリスナー
+struct SoundListener
+{
+	Vector3		Position;
+	Vector3		Direction;
+	Vector3		UpDirection;
+	Vector3		Velocity;
+
+	SoundListener()
+		: Position(0, 0, 0)
+		, Direction(0, 0, 1.0f)
+		, UpDirection(0, 1.0f, 0)
+		, Velocity(0, 0, 0)
+	{}
 };
 
 } // namespace Audio

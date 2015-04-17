@@ -20,7 +20,6 @@ class AudioDevice;
 class AudioManager
 	: public RefObject
 {
-
 public:
 	/// initialize() に渡す初期化データ
 	struct ConfigData
@@ -33,8 +32,9 @@ public:
 	};
 
 public:
-	AudioManager(const ConfigData& configData);
-	virtual ~AudioManager();
+	static AudioManager* Create(const ConfigData& configData);
+
+public:
 
 	/// 終了処理
 	void Finalize();
@@ -46,7 +46,7 @@ public:
 	GameAudio* GetGameAudio() { return mGameAudio; }
 
 	/// デバイスクラスの取得
-	AudioDevice* GetAudioDevice() { return mAudioDevice; }
+	AudioDevice* GetAudioDevice() { return m_audioDevice; }
 
 	///// Sound の作成 ( stream_ = NULL でキーを使った検索だけ行う )
 	//Sound* createSound(FileIO::Stream* stream, SoundPlayType type, bool enable_3d, lnSharingKey key);
@@ -61,8 +61,12 @@ public:
 	//void stopGroup(lnU32 group);
 
 private:
+	AudioManager(const ConfigData& configData);
+	virtual ~AudioManager();
+
+private:
+	AudioDevice*	m_audioDevice;
 	GameAudio*		mGameAudio;
-	AudioDevice*	mAudioDevice;
 	uint32_t		mOnMemoryLimitSize;
 };
 

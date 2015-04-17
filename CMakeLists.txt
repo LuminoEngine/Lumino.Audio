@@ -140,11 +140,17 @@ set(LN_SOURCES
 	external/libvorbis/lib/vorbisfile.c
 	external/libvorbis/lib/window.c
 	src/Audio/AudioDevice.cpp
+	src/Audio/AudioManager.cpp
+	src/Audio/AudioPlayer.cpp
+	src/Audio/AudioUtils.cpp
 	src/Audio/AudioStream.cpp
 	src/Audio/WaveStream.cpp
+	src/Audio/XAudio2/XAudio2AudioDevice.cpp
+	src/Audio/XAudio2/XAudio2AudioPlayer.cpp
 	${LN_PLATFORM_SOURCES})
 	
 set(LN_INCLUDE_DIRECTORIES
+	$ENV{DXSDK_DIR}Include
 	${PROJECT_SOURCE_DIR}/include
 	${PROJECT_SOURCE_DIR}/external/libogg/include
 	${PROJECT_SOURCE_DIR}/external/libvorbis/include
@@ -172,7 +178,7 @@ target_link_libraries(${PROJECT_NAME}_Static ${LN_LINK_LIBS})
 add_custom_command(TARGET ${PROJECT_NAME}_Static POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}_Static> "${PROJECT_SOURCE_DIR}/lib")
 
 # Unit test.
-#add_subdirectory(test)
+add_subdirectory(test)
 
 # samples.
 #add_subdirectory(sample)
