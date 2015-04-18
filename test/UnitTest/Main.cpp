@@ -4,10 +4,12 @@ using namespace Lumino::Audio;
 //#pragma comment(lib, "dinput8.lib")
 int main()
 {
+	//FileManager::
+
 	Logger::Initialize(_T("log.txt"));
 
 	AudioManager::ConfigData data;
-	data.FileManager = NULL;
+	data.FileManager = &FileManager::GetInstance();
 	data.StreamCacheObjectCount = 32;
 	data.StreamSourceCacheMemorySize = 0;
 	data.DMInitMode = DirectMusicInitMode_Normal;

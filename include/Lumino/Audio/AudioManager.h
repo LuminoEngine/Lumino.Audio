@@ -48,6 +48,12 @@ public:
 	/// デバイスクラスの取得
 	AudioDevice* GetAudioDevice() { return m_audioDevice; }
 
+	/// キーに対応するオーディオソースを検索する (見つかった場合は addRef して返す)
+	AudioSourceBase* FindAudioSource(lnSharingKey key);
+
+	/// オーディオソースの作成 (findAudioSource() で見つからなかった場合にのみ呼ぶこと)
+	AudioSourceBase* CreateAudioSource(FileIO::Stream* stream, lnSharingKey key);
+
 	///// Sound の作成 ( stream_ = NULL でキーを使った検索だけ行う )
 	//Sound* createSound(FileIO::Stream* stream, SoundPlayType type, bool enable_3d, lnSharingKey key);
 
