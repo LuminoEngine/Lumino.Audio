@@ -14,11 +14,12 @@ namespace Audio
 class WaveStream
 	: public AudioStream
 {
-protected:
-	WaveStream(Stream* stream);
+public:
+	WaveStream();
 	virtual ~WaveStream();
 
 public:
+	virtual void Create(Stream* stream);
 	virtual StreamFormat GetSourceFormat() const { return StreamFormat_Wave; }
 	virtual const WaveFormat* GetWaveFormat() const { return &mWaveFormat; }
 	virtual uint32_t GetSourceDataSize() const { return mSourceDataSize; }

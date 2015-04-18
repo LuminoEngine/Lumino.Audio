@@ -23,7 +23,7 @@ struct WaveFileHeader
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-WaveStream::WaveStream(Stream* stream)
+WaveStream::WaveStream()
 	: mInStream(NULL)
 	, mSourceDataSize(0)
 	, mDataOffset(0)
@@ -32,6 +32,22 @@ WaveStream::WaveStream(Stream* stream)
 	, mOnmemoryPCMBuffer(NULL)
 	, mOnmemoryPCMBufferSize(0)
 	, mTotalSamples(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+WaveStream::~WaveStream()
+{
+	LN_SAFE_DELETE_ARRAY(mOnmemoryPCMBuffer);
+	LN_SAFE_RELEASE(mInStream);
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void WaveStream::Create(Stream* stream)
 {
 	LN_THROW(stream != NULL, ArgumentException);
 	mInStream = stream;
@@ -63,12 +79,12 @@ WaveStream::WaveStream(Stream* stream)
 		{
 			uint32_t chunkSize = reader.ReadUInt32();	// チャンクサイズ
 
-			mWaveFormat.FormatTag		= reader.ReadUInt16();
-			mWaveFormat.Channels		= reader.ReadUInt16();
-			mWaveFormat.SamplesPerSec	= reader.ReadUInt32();
-			mWaveFormat.AvgBytesPerSec	= reader.ReadUInt32();
-			mWaveFormat.BlockAlign		= reader.ReadUInt16();
-			mWaveFormat.BitsPerSample	= reader.ReadUInt16();
+			mWaveFormat.FormatTag = reader.ReadUInt16();
+			mWaveFormat.Channels = reader.ReadUInt16();
+			mWaveFormat.SamplesPerSec = reader.ReadUInt32();
+			mWaveFormat.AvgBytesPerSec = reader.ReadUInt32();
+			mWaveFormat.BlockAlign = reader.ReadUInt16();
+			mWaveFormat.BitsPerSample = reader.ReadUInt16();
 
 			// 拡張部分のあるファイルの場合は読みとばす
 			if (chunkSize > 16) {
@@ -111,15 +127,8 @@ WaveStream::WaveStream(Stream* stream)
 
 	// data チャンクは見つかっているはず
 	LN_THROW(mDataOffset != 0, InvalidFormatException);
-}
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-WaveStream::~WaveStream()
-{
-	LN_SAFE_DELETE_ARRAY(mOnmemoryPCMBuffer);
-	LN_SAFE_RELEASE(mInStream);
+	OnCreateFinished(NULL);
 }
 
 //-----------------------------------------------------------------------------

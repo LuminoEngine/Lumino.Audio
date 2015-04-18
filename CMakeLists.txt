@@ -144,6 +144,7 @@ set(LN_SOURCES
 	src/Audio/AudioPlayer.cpp
 	src/Audio/AudioUtils.cpp
 	src/Audio/AudioStream.cpp
+	src/Audio/Sound.cpp
 	src/Audio/WaveStream.cpp
 	src/Audio/XAudio2/XAudio2AudioDevice.cpp
 	src/Audio/XAudio2/XAudio2AudioPlayer.cpp

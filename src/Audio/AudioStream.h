@@ -3,6 +3,7 @@
 */
 #pragma once
 
+#include <Lumino/Base/Exception.h>
 #include <Lumino/Base/Cache.h>
 #include <Lumino/IO/Stream.h>
 #include <Lumino/Audio/Common.h>
@@ -11,6 +12,7 @@ namespace Lumino
 {
 namespace Audio
 {
+class ASyncAudioStreamLoadTask;
 
 /// 音声データのベースクラス
 class AudioStream
@@ -23,6 +25,16 @@ protected:
 	virtual ~AudioStream();
 
 public:
+	/// Create 済みかを確認する。例外が保存されていれば throw する (非同期読み込み用)
+	bool CheckCreated();
+
+protected:
+	friend class ASyncAudioStreamLoadTask;
+	void OnCreateFinished(Exception* e);
+
+public:
+	/// 作成
+	virtual void Create(Stream* stream) = 0;
 
 	/// ファイルフォーマットの取得
 	virtual StreamFormat GetSourceFormat() const = 0;
@@ -132,6 +144,10 @@ public:
 	//	this->seek(offset);
 	//	this->read(buffer, buffer_size, read_size, write_size);
 	//}
+
+private:
+	Exception*	m_exception;
+	bool		m_finishedCreate;
 };
 
 } // namespace Audio

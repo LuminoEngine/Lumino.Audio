@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Common.h"
+#include <Lumino/Base/Cache.h>
 #include <Lumino/Base/RefObject.h>
 #include <Lumino/IO/FileManager.h>
 
@@ -13,6 +14,9 @@ namespace Audio
 {
 class GameAudio;
 class AudioDevice;
+class AudioStream;
+class AudioPlayer;
+class Sound;
 
 /*
 	@brief	音声機能の管理クラスです。
@@ -49,10 +53,15 @@ public:
 	AudioDevice* GetAudioDevice() { return m_audioDevice; }
 
 	/// キーに対応するオーディオソースを検索する (見つかった場合は addRef して返す)
-	AudioSourceBase* FindAudioSource(lnSharingKey key);
+	//AudioStream* FindAudioSource(lnSharingKey key);
 
-	/// オーディオソースの作成 (findAudioSource() で見つからなかった場合にのみ呼ぶこと)
-	AudioSourceBase* CreateAudioSource(FileIO::Stream* stream, lnSharingKey key);
+	/// オーディオソースの作成 TODO:internal へ
+	AudioStream* CreateAudioStream(const TCHAR* filePath);
+	AudioStream* CreateAudioStream(Stream* stream, const CacheKey& key);
+
+	AudioPlayer* CreateAudioPlayer(AudioStream* stream, SoundPlayType type, bool enable3D);
+
+	Sound* CreateSound(AudioStream* stream, SoundPlayType type, bool enable3D);
 
 	///// Sound の作成 ( stream_ = NULL でキーを使った検索だけ行う )
 	//Sound* createSound(FileIO::Stream* stream, SoundPlayType type, bool enable_3d, lnSharingKey key);
@@ -69,11 +78,20 @@ public:
 private:
 	AudioManager(const ConfigData& configData);
 	virtual ~AudioManager();
+	void Thread_Polling();
 
 private:
+
+	Lumino::FileManager*	m_fileManager;
 	AudioDevice*	m_audioDevice;
 	GameAudio*		mGameAudio;
 	uint32_t		mOnMemoryLimitSize;
+	Threading::Mutex	m_resourceMutex;
+
+	ArrayList<Sound*>			m_soundList;
+	Threading::Mutex			m_soundListMutex;
+	Threading::EventFlag		m_endRequested;
+	Threading::DelegateThread	m_pollingThread;
 };
 
 } // namespace Audio
