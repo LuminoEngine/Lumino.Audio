@@ -2,6 +2,7 @@
 #include "Internal.h"
 #ifdef LN_WIN32
 	#include "XAudio2/XAudio2AudioDevice.h"
+	#include "DirectMusic/DirectMusicAudioDevice.h"
 #endif
 #include <Lumino/Base/Environment.h>
 #include <Lumino/IO/AsyncIOTask.h>
@@ -9,6 +10,7 @@
 #include <Lumino/Audio/Sound.h>
 #include "AudioUtils.h"
 #include "WaveStream.h"
+#include "MidiStream.h"
 
 namespace Lumino
 {
@@ -53,6 +55,7 @@ AudioManager* AudioManager::Create(const ConfigData& configData)
 AudioManager::AudioManager(const ConfigData& configData)
 	: m_fileManager(configData.FileManager)
 	, m_audioDevice(NULL)
+	, m_midiAudioDevice(NULL)
 	, mOnMemoryLimitSize(100000)
 {
 #ifdef LN_WIN32
@@ -64,6 +67,16 @@ AudioManager::AudioManager(const ConfigData& configData)
 			m_audioDevice = device;
 		}
 		//mAudioDevice = LN_NEW NullAudioDevice();
+	}
+	if (m_midiAudioDevice == NULL)
+	{
+		RefPtr<DirectMusicAudioDevice> device(LN_NEW DirectMusicAudioDevice());
+		DirectMusicAudioDevice::ConfigData data;
+		data.DMInitMode = configData.DMInitMode;
+		data.hWnd = (HWND)configData.hWnd;
+		device->Initialize(data);
+		device.SafeAddRef();
+		m_midiAudioDevice = device;
 	}
 #else
 #endif
@@ -88,6 +101,7 @@ AudioManager::~AudioManager()
 	m_soundList.Clear();
 
 	LN_SAFE_RELEASE(m_audioDevice);
+	LN_SAFE_RELEASE(m_midiAudioDevice);
 }
 
 //-----------------------------------------------------------------------------
@@ -135,12 +149,10 @@ AudioStream* AudioManager::CreateAudioStream(Stream* stream, const CacheKey& key
 //	case AUDIOSOURCE_OGG:
 //		audio_source.attach(LN_NEW Ogg(this), false);
 //		break;
-//#if defined(LNOTE_MSVC)
-//		// MIDI
-//	case AUDIOSOURCE_MIDI:
-//		audio_source.attach(LN_NEW Midi(this), false);
-//		break;
-//#endif
+		// MIDI
+	case StreamFormat_Midi:
+		audioStream.Attach(LN_NEW MidiStream(), false);
+		break;
 	default:
 		LN_THROW(stream != NULL, InvalidFormatException);
 		return NULL;
@@ -178,7 +190,12 @@ AudioPlayer* AudioManager::CreateAudioPlayer(AudioStream* stream, SoundPlayType 
 	SoundPlayType playerType = AudioUtils::CheckAudioPlayType(type, stream, mOnMemoryLimitSize);
 
 	// ì¬
-	return m_audioDevice->CreateAudioPlayer(stream, enable3D, playerType);
+	if (playerType == SoundPlayType_Midi) {
+		return m_midiAudioDevice->CreateAudioPlayer(stream, enable3D, playerType);
+	}
+	else {
+		return m_audioDevice->CreateAudioPlayer(stream, enable3D, playerType);
+	}
 
 
 	//Threading::ScopedLock lock(*mLock);

@@ -46,13 +46,18 @@ public:
 	int GetPitch() const;
 
 	/**
-		@brief		ループ再生の情報を設定します。
+		@brief		ループ再生の有無を設定します。
 		@param[in]	enabled		: ループ再生するか
+	*/
+	void SetLoopEnabled(bool enabled);
+
+	/**
+		@brief		ループ範囲を設定します。
 		@param[in]	begin		: ループ範囲の開始サンプル
 		@param[in]	length		: ループ範囲のサンプル数
 		@details	MIDI の場合、ループ範囲はミュージックタイム単位 (四分音符ひとつ分を 768 で表す) で指定します。 
 	*/
-	void SetLoopState(bool enabled, uint32_t begin, uint32_t length);
+	void SetLoopRange(uint32_t begin, uint32_t length);
 
 	/**
 		@brief		ループ再生が有効かを確認します。

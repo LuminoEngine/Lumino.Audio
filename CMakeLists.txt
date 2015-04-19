@@ -144,10 +144,14 @@ set(LN_SOURCES
 	src/Audio/AudioPlayer.cpp
 	src/Audio/AudioUtils.cpp
 	src/Audio/AudioStream.cpp
+	src/Audio/MidiStream.cpp
 	src/Audio/Sound.cpp
 	src/Audio/WaveStream.cpp
 	src/Audio/XAudio2/XAudio2AudioDevice.cpp
 	src/Audio/XAudio2/XAudio2AudioPlayer.cpp
+	src/Audio/DirectMusic/DirectMusic.cpp
+	src/Audio/DirectMusic/DirectMusicAudioDevice.cpp
+	src/Audio/DirectMusic/DirectMusicAudioPlayer.cpp
 	${LN_PLATFORM_SOURCES})
 	
 set(LN_INCLUDE_DIRECTORIES

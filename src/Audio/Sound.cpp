@@ -56,14 +56,6 @@ Sound::~Sound()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int Sound::GetVolume() const
-{
-	return m_volume;
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void Sound::SetVolume(int volume)
 {
 	m_volume = volume;
@@ -75,9 +67,9 @@ void Sound::SetVolume(int volume)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int Sound::GetPitch() const
+int Sound::GetVolume() const
 {
-	return m_pitch;
+	return m_volume;
 }
 
 //-----------------------------------------------------------------------------
@@ -94,14 +86,31 @@ void Sound::SetPitch(int pitch)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void Sound::SetLoopState(bool enabled, uint32_t begin, uint32_t length)
+int Sound::GetPitch() const
+{
+	return m_pitch;
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void Sound::SetLoopEnabled(bool enabled)
 {
 	m_loopEnabled = enabled;
+	if (m_audioPlayer != NULL) {
+		m_audioPlayer->loop(enabled);
+	}
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
+void Sound::SetLoopRange(uint32_t begin, uint32_t length)
+{
 	m_loopBegin = begin;
 	m_loopLength = length;
 
 	if (m_audioPlayer != NULL) {
-		m_audioPlayer->loop(enabled);
 		m_audioPlayer->setLoopState(begin, length);
 	}
 }

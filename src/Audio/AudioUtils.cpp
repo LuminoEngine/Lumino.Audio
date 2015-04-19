@@ -94,11 +94,11 @@ StreamFormat AudioUtils::CheckFormat(Stream* stream)
 	}
 	else if (memcmp(head, "MThd", 4) == 0)
 	{
-		format = StreamFormat_MIDI;
+		format = StreamFormat_Midi;
 	}
 	else if (memcmp(head, "ID3", 3) == 0)
 	{
-		format = StreamFormat_MP3;
+		format = StreamFormat_Mp3;
 	}
 
 	if (format == StreamFormat_Unknown)
@@ -107,7 +107,7 @@ StreamFormat AudioUtils::CheckFormat(Stream* stream)
 		// 同期ヘッダだけあったりするので全部チェックする
 		if (head[0] == 0xff && head[1] >> 5 == 0x07)
 		{
-			format = StreamFormat_MP3;
+			format = StreamFormat_Mp3;
 		}
 		else
 		{
@@ -116,7 +116,7 @@ StreamFormat AudioUtils::CheckFormat(Stream* stream)
 			stream->Read(data, 3);
 			if (data[0] == 'T' && data[1] == 'A' && data[2] == 'G')
 			{
-				format = StreamFormat_MP3;
+				format = StreamFormat_Mp3;
 			}
 		}
 	}
@@ -131,9 +131,9 @@ StreamFormat AudioUtils::CheckFormat(Stream* stream)
 SoundPlayType AudioUtils::CheckAudioPlayType(SoundPlayType type, AudioStream* audioStream, uint32_t limitSize)
 {
 	// 作成するオーディオプレイヤーの種類を決めていく
-	if (audioStream->GetSourceFormat() == StreamFormat_MIDI)
+	if (audioStream->GetSourceFormat() == StreamFormat_Midi)
 	{
-		type = SoundPlayType_MIDI;
+		type = SoundPlayType_Midi;
 	}
 	else
 	{

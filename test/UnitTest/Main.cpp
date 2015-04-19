@@ -1,4 +1,5 @@
 #include <TestConfig.h>
+#include <Lumino/Platform/PlatformSupport.h>
 #include "../../src/Audio/AudioStream.h"
 #include "../../src/Audio/AudioPlayer.h"
 using namespace Lumino::Audio;
@@ -8,6 +9,10 @@ int main()
 {
 	//FileManager::
 
+	
+	Platform::ApplicationSettings s;
+	Platform::Application app(s);
+
 	Logger::Initialize(_T("log.txt"));
 
 	AudioManager::ConfigData data;
@@ -15,7 +20,7 @@ int main()
 	data.StreamCacheObjectCount = 32;
 	data.StreamSourceCacheMemorySize = 0;
 	data.DMInitMode = DirectMusicInitMode_Normal;
-	data.hWnd = NULL;
+	data.hWnd = Platform::PlatformSupport::GetWindowHandle(app.GetMainWindow());
 	RefPtr<AudioManager> manager(AudioManager::Create(data));
 	
 	//RefPtr<AudioStream> stream(manager->CreateAudioStream(_T("D:/MMD/オーディオ/ZIGG-ZAGG.wav")));
@@ -23,8 +28,10 @@ int main()
 	//player->play();
 
 	RefPtr<AudioStream> stream(manager->CreateAudioStream(_T("D:/MMD/オーディオ/ZIGG-ZAGG.wav")));
+	//RefPtr<AudioStream> stream(manager->CreateAudioStream(_T("D:/tmp/ln21.mid")));
 	RefPtr<Sound> sound(manager->CreateSound(stream, SoundPlayType_Unknown, false));
 	sound->SetPitch(110);
+	sound->SetLoopEnabled(true);
 	sound->Play();
 
 	getchar();

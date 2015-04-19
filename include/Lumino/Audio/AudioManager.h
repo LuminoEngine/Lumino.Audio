@@ -83,7 +83,8 @@ private:
 private:
 
 	Lumino::FileManager*	m_fileManager;
-	AudioDevice*	m_audioDevice;
+	AudioDevice*			m_audioDevice;		///< PCM 再生用デバイスクラス
+	AudioDevice*			m_midiAudioDevice;	///< MIDI 再生用デバイスクラス (内部処理が PCM とは全然違うので、1つの AudioDevice にまとめない方が管理が楽)
 	GameAudio*		mGameAudio;
 	uint32_t		mOnMemoryLimitSize;
 	Threading::Mutex	m_resourceMutex;

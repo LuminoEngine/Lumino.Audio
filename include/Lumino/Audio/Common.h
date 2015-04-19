@@ -6,6 +6,8 @@
 #include <Lumino/Math/Vector3.h>
 #include <Lumino/Base/Common.h>
 
+#define LN_MUSIC_TIME_BASE	768
+
 namespace Lumino
 {
 namespace Audio
@@ -16,9 +18,9 @@ enum StreamFormat
 {
 	StreamFormat_Unknown = 0,		///< 不明なファイル
 	StreamFormat_Wave,				///< WAVE
-	StreamFormat_MP3,				///< MP3
+	StreamFormat_Mp3,				///< MP3
 	StreamFormat_Ogg,				///< OGG
-	StreamFormat_MIDI,				///< MIDI
+	StreamFormat_Midi,				///< MIDI
 
 	StreamFormat_Max,				///< (terminator)
 };
@@ -53,7 +55,7 @@ enum SoundPlayType
 	//SoundPlayType_Auto,				///< 自動選択 ( デフォルトではデコード後のサイズが 10000 バイト以上になる場合はストリーミング、そうでない場合はオンメモリ再生になります )
 	SoundPlayType_OnMemory,			///< オンメモリ
 	SoundPlayType_Streaming,	    ///< ストリーミング
-	SoundPlayType_MIDI,  			///< SMF
+	SoundPlayType_Midi,  			///< SMF
 
 	SoundPlayType_Max,
 };

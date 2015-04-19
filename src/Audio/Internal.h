@@ -1,6 +1,8 @@
 
 #pragma once
 
+#define INITGUID
+
 #include <Lumino/Base/Common.h>
 #include <Lumino/Base/Logger.h>
 #include <Lumino/Base/Exception.h>
