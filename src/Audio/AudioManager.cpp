@@ -5,38 +5,38 @@
 	#include "DirectMusic/DirectMusicAudioDevice.h"
 #endif
 #include <Lumino/Base/Environment.h>
-#include <Lumino/IO/AsyncIOTask.h>
+#include <Lumino/IO/ASyncIOObject.h>
 #include <Lumino/Audio/AudioManager.h>
 #include <Lumino/Audio/Sound.h>
 #include "AudioUtils.h"
-#include "WaveStream.h"
-#include "MidiStream.h"
+#include "WaveDecoder.h"
+#include "MidiDecoder.h"
 
 namespace Lumino
 {
 namespace Audio
 {
 
-class ASyncAudioStreamLoadTask
-	: public AsyncIOTask
-{
-public:
-	RefPtr<AudioStream>	m_audioStream;
-	RefPtr<Stream>		m_sourceStream;
-
-public:
-	virtual void Execute()
-	{
-		try
-		{
-			m_audioStream->Create(m_sourceStream);
-		}
-		catch (Exception* e) {
-			m_audioStream->OnCreateFinished(e);
-		}
-	}
-};
-
+//class ASyncAudioStreamLoadTask
+//	: public AsyncIOTask
+//{
+//public:
+//	RefPtr<AudioStream>	m_audioStream;
+//	RefPtr<Stream>		m_sourceStream;
+//
+//public:
+//	virtual void Execute()
+//	{
+//		try
+//		{
+//			m_audioStream->Create(m_sourceStream);
+//		}
+//		catch (Exception* e) {
+//			m_audioStream->OnCreateFinished(e);
+//		}
+//	}
+//};
+//
 //=============================================================================
 // AudioManager
 //=============================================================================
@@ -57,6 +57,7 @@ AudioManager::AudioManager(const ConfigData& configData)
 	, m_audioDevice(NULL)
 	, m_midiAudioDevice(NULL)
 	, mOnMemoryLimitSize(100000)
+	, m_audioStreamCache(NULL)
 {
 #ifdef LN_WIN32
 	if (m_audioDevice == NULL)
@@ -80,6 +81,8 @@ AudioManager::AudioManager(const ConfigData& configData)
 	}
 #else
 #endif
+	// キャッシュ初期化
+	m_audioStreamCache = LN_NEW CacheManager(32, 65535);
 
 	// ポーリングスレッド開始
 	m_pollingThread.Start(LN_CreateDelegate(this, &AudioManager::Thread_Polling));
@@ -100,6 +103,10 @@ AudioManager::~AudioManager()
 	}
 	m_soundList.Clear();
 
+	if (m_audioStreamCache != NULL) {
+		m_audioStreamCache->Finalize();
+		LN_SAFE_RELEASE(m_audioStreamCache);
+	}
 	LN_SAFE_RELEASE(m_audioDevice);
 	LN_SAFE_RELEASE(m_midiAudioDevice);
 }
@@ -125,57 +132,23 @@ AudioStream* AudioManager::CreateAudioStream(const TCHAR* filePath)
 //-----------------------------------------------------------------------------
 AudioStream* AudioManager::CreateAudioStream(Stream* stream, const CacheKey& key)
 {
-	LN_THROW(stream != NULL, ArgumentException);
+	// キャッシュを検索する。
+	// 見つかった AudioStream は、まだ非同期初期化中であることもある。
+	RefPtr<AudioStream> audioStream((AudioStream*)m_audioStreamCache->FindObjectAddRef(key), false);
 
-	StreamFormat format = AudioUtils::CheckFormat(stream);
-
-	Threading::MutexScopedLock lock(m_resourceMutex);
-
-	RefPtr<AudioStream> audioStream;
-
-	switch (format)
+	// キャッシュに見つからなかったら新しく作る
+	if (audioStream.IsNull())
 	{
-		// Wave
-	case StreamFormat_Wave:
-		audioStream.Attach(LN_NEW WaveStream(), false);
-		break;
-//#if defined(LNOTE_MSVC)
-//		// MP3
-//	case AUDIOSOURCE_MP3:
-//		audio_source.attach(LN_NEW MP3(this), false);
-//		break;
-//#endif
-//		// OGG
-//	case AUDIOSOURCE_OGG:
-//		audio_source.attach(LN_NEW Ogg(this), false);
-//		break;
-		// MIDI
-	case StreamFormat_Midi:
-		audioStream.Attach(LN_NEW MidiStream(), false);
-		break;
-	default:
-		LN_THROW(stream != NULL, InvalidFormatException);
-		return NULL;
-	}
+		audioStream.Attach(LN_NEW AudioStream(stream), false);
+		audioStream->Create();	// 非同期読み込み開始
+		/*
+			非同期読み込みの開始で FileManager のタスクリストに入れられる。
+			そこで参照カウントが +1 され、処理が完了するまで参照され続ける。
+		*/
 
-	if (1)
-	{
-		ASyncAudioStreamLoadTask* task = LN_NEW ASyncAudioStreamLoadTask();
-		task->m_audioStream = audioStream;
-		task->m_sourceStream = stream;
-		m_fileManager->RequestASyncTask(task);
+		// キャッシュに登録
+		m_audioStreamCache->RegisterCacheObject(key, audioStream);
 	}
-	else
-	{
-		// 入力ファイルを設定する
-		audioStream->Create(stream);
-	}
-
-	// MP3 と MIDI 以外は登録
-	//if (key.isEmpty() == false && (format != AUDIOSOURCE_MP3 && format != AUDIOSOURCE_MIDI))
-	//{
-	//	Base::CacheManager::registerCachedObject(key, audio_source);
-	//}
 
 	audioStream.SafeAddRef();
 	return audioStream;
@@ -196,65 +169,15 @@ AudioPlayer* AudioManager::CreateAudioPlayer(AudioStream* stream, SoundPlayType 
 	else {
 		return m_audioDevice->CreateAudioPlayer(stream, enable3D, playerType);
 	}
-
-
-	//Threading::ScopedLock lock(*mLock);
-
-	//SoundPlayType player_type = SOUNDPLAYTYPE_UNKNOWN;
-
-	////-----------------------------------------------------
-	//// AudioSourceBase
-
-	//// キャッシュ検索
-	//Base::RefPtr<AudioSourceBase> source(
-	//	mResourceManager->findAudioSource(key), false);
-
-	//// キャッシュに無かった
-	//if (source.getPtr() == NULL)
-	//{
-	//	// 検索のみ行ったが、見つからなかった
-	//	if (stream == NULL) return NULL;
-
-	//	source.attach(
-	//		mResourceManager->createAudioSource(stream, key), false);
-
-	//	// 正しい種類をチェック
-	//	player_type = AudioUtil::checkAudioPlayType(type, source, mOnMemoryLimitSize);
-	//}
-	//// キャッシュに見つかった
-	//else
-	//{
-	//	// MIDI はそのまま
-	//	if (source->getSourceFormat() == AUDIOSOURCE_MIDI) {
-	//		player_type = SOUNDPLAYTYPE_MIDI;
-	//	}
-	//	// すでにオンメモリロードが完了しているものはすべてオンメモリ
-	//	else if (source->getOnmemoryPCMBuffer()) {
-	//		player_type = SOUNDPLAYTYPE_ONMEMORY;
-	//	}
-	//	// それ以外はストリーミング
-	//	else {
-	//		player_type = SOUNDPLAYTYPE_STREAMING;
-	//	}
-	//}
-
-	////-----------------------------------------------------
-	//// AudioPlayerBase
-	//Base::RefPtr<AudioPlayerBase> player(
-	//	mAudioDevice->createAudioPlayer(source, enable_3d, player_type));
-
-	//// Sound 作成
-	//Sound* sound = LN_NEW Sound(this, player);
-	//mSoundList.push_back(sound);
-	//return sound;;
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-Sound* AudioManager::CreateSound(AudioStream* stream, SoundPlayType type, bool enable3D)
+Sound* AudioManager::CreateSound(Stream* stream, SoundPlayType type, bool enable3D, const CacheKey& key)
 {
-	RefPtr<Sound> sound(LN_NEW Sound(this, stream, type, enable3D));
+	RefPtr<AudioStream> audioStream(CreateAudioStream(stream, key));
+	RefPtr<Sound> sound(LN_NEW Sound(this, audioStream, type, enable3D));
 
 	// 管理リストに追加
 	Threading::MutexScopedLock lock(m_soundListMutex);

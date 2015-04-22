@@ -44,7 +44,7 @@ void XAudio2AudioPlayerBase::Initialize(AudioStream* audioStream, bool enable3d)
 
 	if (enable3d)
 	{
-		mEmitterState = LN_NEW EmitterState(m_audioStream->GetWaveFormat()->Channels);
+		mEmitterState = LN_NEW EmitterState(m_decoder->GetWaveFormat()->Channels);
 	}
 }
 
@@ -106,7 +106,7 @@ void XAudio2OnMemoryAudioPlayer::Initialize(AudioStream* audioStream, bool enabl
 	XAudio2AudioPlayerBase::Initialize(audioStream, enable3d);
 
 	// オンメモリ再生用に内部に持ってるバッファを埋める
-	m_audioStream->FillOnmemoryBuffer();
+	m_decoder->FillOnmemoryBuffer();
 }
 
 //-----------------------------------------------------------------------------
@@ -155,7 +155,7 @@ void XAudio2OnMemoryAudioPlayer::play()
     stop();
 
     // XAudio のソースボイス作成
-	const WaveFormat* ln_format = m_audioStream->GetWaveFormat();
+	const WaveFormat* ln_format = m_decoder->GetWaveFormat();
 	WAVEFORMATEX format;
 	AudioUtils::ConvertLNWaveFormatToWAVEFORMATEX(*ln_format, &format);
 
@@ -165,8 +165,8 @@ void XAudio2OnMemoryAudioPlayer::play()
         
     // SourceVoiceに送信するデータ
     XAUDIO2_BUFFER submit = { 0 };
-	submit.AudioBytes = m_audioStream->GetOnmemoryPCMBufferSize();	// バッファのバイト数
-	submit.pAudioData = m_audioStream->GetOnmemoryPCMBuffer();		// バッファの先頭アドレス
+	submit.AudioBytes = m_decoder->GetOnmemoryPCMBufferSize();	// バッファのバイト数
+	submit.pAudioData = m_decoder->GetOnmemoryPCMBuffer();		// バッファの先頭アドレス
 	submit.Flags = XAUDIO2_END_OF_STREAM;
 
 	// ループ再生する場合
@@ -328,7 +328,7 @@ void XAudio2StreamingAudioPlayer::Initialize(AudioStream* audioStream, bool enab
 	XAudio2AudioPlayerBase::Initialize(audioStream, enable3d);
 
 	// 1 秒分のバッファサイズ取得
-	mAudioDataBufferSize = m_audioStream->GetBytesPerSec();
+	mAudioDataBufferSize = m_decoder->GetBytesPerSec();
 
 	// 1 秒のバッファをふたつ用意
 	mPrimaryAudioData	= LN_NEW uint8_t[ mAudioDataBufferSize ];
@@ -381,7 +381,7 @@ void XAudio2StreamingAudioPlayer::play()
     stop();
 
     // ソースボイス作成
-	const WaveFormat* ln_format = m_audioStream->GetWaveFormat();
+	const WaveFormat* ln_format = m_decoder->GetWaveFormat();
 	WAVEFORMATEX format;
     AudioUtils::ConvertLNWaveFormatToWAVEFORMATEX( *ln_format, &format );
 
@@ -389,14 +389,14 @@ void XAudio2StreamingAudioPlayer::play()
 	LN_COMCALL(mSourceVoice->FlushSourceBuffers());
 
 	// デコード状態をリセットする ( MP3 用 )
-	m_audioStream->Reset();
+	m_decoder->Reset();
 
 	// ストリーミング読み込み位置リセット
 	mReadCursor = 0;
 
     // とりあえずソースデータをカーソルの終端にする。
     // ファイル内から読むのは _addNextBuffer() で
-	mCursorEndPos = m_audioStream->GetSourceDataSize();
+	mCursorEndPos = m_decoder->GetSourceDataSize();
         
     mWriteSampleNum = 0;
     mCursorBeginPos = 0;
@@ -483,7 +483,7 @@ bool XAudio2StreamingAudioPlayer::polling()
 			if ( mIsLoop )
 			{
 				mReadCursor = mCursorBeginPos;
-				mCursorEndPos = m_audioStream->GetSourceDataSize();
+				mCursorEndPos = m_decoder->GetSourceDataSize();
 			}
 			// ループ再生しない場合はファイルの最後まで読み切ったことを示すフラグを ON
 			else
@@ -547,7 +547,7 @@ void XAudio2StreamingAudioPlayer::_addNextBuffer()
 	// データ読み込み
 	uint32_t read_size;		// 呼んだサイズ
 	uint32_t write_size;		// デコードして書き込んだサイズ
-	m_audioStream->Read(mReadCursor, mSecondaryAudioData, mAudioDataBufferSize, &read_size, &write_size);
+	m_decoder->Read(mReadCursor, mSecondaryAudioData, mAudioDataBufferSize, &read_size, &write_size);
 
 	// 実際に元データから読んだデータ分、カーソルを進める
 	mReadCursor += read_size;
@@ -560,15 +560,15 @@ void XAudio2StreamingAudioPlayer::_addNextBuffer()
     // ループ上で扱うサンプル数は、チャンネル数関係無しになってる。
     // それを正しい値に変換するため、実際の 1 サンプルあたりのバイト数を計算する
     uint32_t smp_size =
-		m_audioStream->GetWaveFormat()->Channels *
-		m_audioStream->GetWaveFormat()->BitsPerSample / 8;
+		m_decoder->GetWaveFormat()->Channels *
+		m_decoder->GetWaveFormat()->BitsPerSample / 8;
 
     if ( mIsLoop )
     {
         if ( mLoopBegin == 0 && mLoopLength == 0 )
         {
             mCursorBeginPos = 0;
-			mCursorEndPos = m_audioStream->GetSourceDataSize();
+			mCursorEndPos = m_decoder->GetSourceDataSize();
         }
         else
         {

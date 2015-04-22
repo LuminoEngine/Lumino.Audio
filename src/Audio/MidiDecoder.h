@@ -1,5 +1,5 @@
 /*
-	@file	WaveStream.h
+	@file	MidiDecoder.h
 */
 #pragma once
 
@@ -13,12 +13,12 @@ namespace Audio
 {
 
 /// MIDI データ AudioStream
-class MidiStream
-	: public AudioStream
+class MidiDecoder
+	: public AudioDecoder
 {
 public:
-	MidiStream();
-	virtual ~MidiStream();
+	MidiDecoder();
+	virtual ~MidiDecoder();
 
 public:
 	/// メモリ上に展開された MIDI データの取得

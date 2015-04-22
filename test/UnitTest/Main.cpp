@@ -27,12 +27,14 @@ int main()
 	//RefPtr<AudioPlayer> player(manager->CreateAudioPlayer(stream, SoundPlayType_OnMemory, false));
 	//player->play();
 
+#if 0
 	RefPtr<AudioStream> stream(manager->CreateAudioStream(_T("D:/MMD/オーディオ/ZIGG-ZAGG.wav")));
 	//RefPtr<AudioStream> stream(manager->CreateAudioStream(_T("D:/tmp/ln21.mid")));
 	RefPtr<Sound> sound(manager->CreateSound(stream, SoundPlayType_Unknown, false));
 	sound->SetPitch(110);
 	sound->SetLoopEnabled(true);
 	sound->Play();
+#endif
 
 	getchar();
 

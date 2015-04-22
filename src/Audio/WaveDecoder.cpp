@@ -1,7 +1,7 @@
 
 #include <Lumino/Base/Exception.h>
 #include <Lumino/IO/BinaryReader.h>
-#include "WaveStream.h"
+#include "WaveDecoder.h"
 
 namespace Lumino
 {
@@ -17,13 +17,13 @@ struct WaveFileHeader
 };
 
 //=============================================================================
-// WaveStream
+// WaveDecoder
 //=============================================================================
 	
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-WaveStream::WaveStream()
+WaveDecoder::WaveDecoder()
 	: mInStream(NULL)
 	, mSourceDataSize(0)
 	, mDataOffset(0)
@@ -38,7 +38,7 @@ WaveStream::WaveStream()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-WaveStream::~WaveStream()
+WaveDecoder::~WaveDecoder()
 {
 	LN_SAFE_DELETE_ARRAY(mOnmemoryPCMBuffer);
 	LN_SAFE_RELEASE(mInStream);
@@ -47,7 +47,7 @@ WaveStream::~WaveStream()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void WaveStream::Create(Stream* stream)
+void WaveDecoder::Create(Stream* stream)
 {
 	LN_THROW(stream != NULL, ArgumentException);
 	mInStream = stream;
@@ -127,14 +127,12 @@ void WaveStream::Create(Stream* stream)
 
 	// data チャンクは見つかっているはず
 	LN_THROW(mDataOffset != 0, InvalidFormatException);
-
-	OnCreateFinished(NULL);
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void WaveStream::FillOnmemoryBuffer()
+void WaveDecoder::FillOnmemoryBuffer()
 {
 	Threading::MutexScopedLock lock(m_mutex);
 
@@ -169,7 +167,7 @@ void WaveStream::FillOnmemoryBuffer()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void WaveStream::Read(uint32_t seekPos, void* buffer, uint32_t buffer_size, uint32_t* out_read_size, uint32_t* out_write_size)
+void WaveDecoder::Read(uint32_t seekPos, void* buffer, uint32_t buffer_size, uint32_t* out_read_size, uint32_t* out_write_size)
 {
 	LN_THROW(mInStream != NULL, InvalidOperationException);	// オンメモリ再生とストリーミング再生で同じ AudioStream を共有したときにぶつかる
 	Threading::MutexScopedLock lock(m_mutex);

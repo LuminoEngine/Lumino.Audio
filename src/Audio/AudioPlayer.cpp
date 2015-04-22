@@ -48,10 +48,11 @@ void AudioPlayer::Initialize(AudioStream* audioStream, bool enable3d)
 { 
 	LN_THROW(audioStream, ArgumentException);
 	LN_REFOBJ_SET(m_audioStream, audioStream);
+	m_decoder = m_audioStream->GetDecoder();
 
     // ソースからループ位置を取得
     uint32_t loop_begin, loop_length;
-	m_audioStream->GetLoopState(&loop_begin, &loop_length);
+	m_decoder->GetLoopState(&loop_begin, &loop_length);
     mLoopBegin  = loop_begin;
 	mLoopLength = loop_length;
 }
@@ -83,7 +84,7 @@ void AudioPlayer::setLoopState(uint32_t loop_begin, uint32_t loop_length)
     {
         // ソースからループ位置を取得して設定する
 		uint32_t begin, length;
-		m_audioStream->GetLoopState(&begin, &length);
+		m_decoder->GetLoopState(&begin, &length);
         mLoopBegin  = begin;
 		mLoopLength = length;
     }

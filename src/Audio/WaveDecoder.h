@@ -1,5 +1,5 @@
 /*
-	@file	WaveStream.h
+	@file	WaveDecoder.h
 */
 #pragma once
 
@@ -11,12 +11,12 @@ namespace Audio
 {
 
 /// Wave ÉfÅ[É^ AudioStream
-class WaveStream
-	: public AudioStream
+class WaveDecoder
+	: public AudioDecoder
 {
 public:
-	WaveStream();
-	virtual ~WaveStream();
+	WaveDecoder();
+	virtual ~WaveDecoder();
 
 public:
 	virtual void Create(Stream* stream);
@@ -29,7 +29,7 @@ public:
 	virtual uint32_t GetBytesPerSec() const { return mWaveFormat.AvgBytesPerSec; }
 	virtual void GetLoopState(uint32_t* begin, uint32_t* length) const { *begin = 0; *length = 0; }
 	virtual void FillOnmemoryBuffer();
-	virtual void Read(uint32_t seekPos, void* buffer, uint32_t buffer_size, uint32_t* out_read_size, uint32_t* out_write_size);
+	virtual void Read(uint32_t seekPos, void* buffer, uint32_t bufferSize, uint32_t* outReadSize, uint32_t* outWriteSize);
 	virtual void Reset() {}
 
 private:

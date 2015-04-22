@@ -89,7 +89,7 @@ if (WIN32)
 	#------------------------------------------------------
 	
 	# link librarys.
-	#list(APPEND LN_LINK_LIBS "imagehlp.lib")
+	list(APPEND LN_LINK_LIBS "msacm32.lib")
 	
 	# platform sources.
 	#set(LN_PLATFORM_SOURCES
@@ -153,11 +153,13 @@ set(LN_SOURCES
 	src/Audio/AudioUtils.cpp
 	src/Audio/AudioUtils.h
 	src/Audio/Internal.h
-	src/Audio/MidiStream.cpp
-	src/Audio/MidiStream.h
+	src/Audio/MidiDecoder.cpp
+	src/Audio/MidiDecoder.h
+	src/Audio/Mp3Decoder.cpp
+	src/Audio/Mp3Decoder.h
 	src/Audio/Sound.cpp
-	src/Audio/WaveStream.cpp
-	src/Audio/WaveStream.h
+	src/Audio/WaveDecoder.cpp
+	src/Audio/WaveDecoder.h
 	src/Audio/XAudio2/XAudio2AudioDevice.cpp
 	src/Audio/XAudio2/XAudio2AudioDevice.h
 	src/Audio/XAudio2/XAudio2AudioPlayer.cpp

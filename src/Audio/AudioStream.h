@@ -6,31 +6,58 @@
 #include <Lumino/Base/Exception.h>
 #include <Lumino/Base/Cache.h>
 #include <Lumino/IO/Stream.h>
+#include <Lumino/IO/ASyncIOObject.h>
+#include <Lumino/IO/FileManager.h>
 #include <Lumino/Audio/Common.h>
 
 namespace Lumino
 {
 namespace Audio
 {
-class ASyncAudioStreamLoadTask;
+class AudioDecoder;
 
-/// 音声データのベースクラス
 class AudioStream
-	: public RefObject
+	: public ASyncIOObject
 	, public ICacheObject
 {
 	LN_CACHE_OBJECT_DECL;
-protected:
-	AudioStream();
+public:
+	AudioStream(Stream* stream);
 	virtual ~AudioStream();
 
-public:
-	/// Create 済みかを確認する。例外が保存されていれば throw する (非同期読み込み用)
+	void Create() { InvokeIOProc(true, &FileManager::GetInstance()); }
+
+	/// 初期化が完了しているか確認する (例外が発生していればここから再 throw される)
 	bool CheckCreated();
 
+	/// デコーダの取得
+	AudioDecoder* GetDecoder() { return m_decoder; }
+	const AudioDecoder* GetDecoder() const { return m_decoder; }
+
 protected:
-	friend class ASyncAudioStreamLoadTask;
-	void OnCreateFinished(Exception* e);
+	///　非同期ロード処理
+	virtual void OnASyncIOProc();
+
+private:
+	Stream*			m_stream;
+	AudioDecoder*	m_decoder;
+};
+
+/// 音声データのベースクラス
+class AudioDecoder
+	: public RefObject
+{
+protected:
+	AudioDecoder();
+	virtual ~AudioDecoder();
+
+//public:
+//	/// Create 済みかを確認する。例外が保存されていれば throw する (非同期読み込み用)
+//	bool CheckCreated();
+//
+//protected:
+//	friend class ASyncAudioStreamLoadTask;
+//	void OnCreateFinished(Exception* e);
 
 public:
 	/// 作成
@@ -87,31 +114,20 @@ public:
 	/// ※スレッドセーフで実装する
 	virtual void FillOnmemoryBuffer() = 0;
 
-	//----------------------------------------------------------------------
-	///**
-	//  @brief      データをデコードし、buffer_ に書き込む
-	//
-	//  @param[out] buffer          : PCM データを書き込むバッファ
-	//  @param[in]  buffer_size     : buffer_ のサイズ ( バイト単位 )
-	//  @param[out] out_read_size   : ソースデータから読み込んだデータサイズ
-	//  @param[out] out_write_size  : 実際に buffer_ に書き込んだサイズ
-	//  @par
-	//              できるだけ buffer_size を満たすようにデータをデコードし、
-	//              buffer 書き込みます。
-	//              通常、buffer_size は getBytesPerSec() と同じ値です。<br>
-	//              <br>
-	//              read_size はデコードの為にソースから読み込んだデータサイズです。
-	//              通常、mp3 等の圧縮フォーマットでは write_size よりも小さい値になります。
-	//              現在のファイルポインタに read_size の値を足した値が、
-	//              次回の読み込み位置となります。<br>
-	//              <br>
-	//              write_size は、通常は buffer_size と同じ値ですが、
-	//              ファイル終端などでは buffer_size よりも小さい値 ( 音声データがあるところまで )
-	//              になります。	
-	//*/
-	//----------------------------------------------------------------------
-	/// ※スレッドセーフで実装する
-	virtual void Read(uint32_t seekPos, void* buffer, uint32_t buffer_size, uint32_t* out_read_size, uint32_t* out_write_size) = 0;
+	/*
+		データをデコードし、buffer に書き込む
+		@param[in]	seekPos			: シーク位置
+		@param[out]	buffer			: PCM データを書き込むバッファ
+		@param[in]	bufferSize		: buffer のサイズ (バイト単位)
+		@param[in]	outReadSize		: ソースストリームから読み込んだデータサイズ (現在のシーク位置にこの値を加算した値が、次の読み取りシーク位置になる)
+		@param[in]	outWriteSize	: 実際に buffer に書き込んだサイズ (デコードされたPCMデータのサイズ = デバイスに渡すバイト数)
+		@details	できるだけ buffer_size を満たすようにデータをデコードし、buffer 書き込みます。
+					outReadSize はデコードの為にソースストリームから読み込んだデータサイズです。
+					通常、mp3 等の圧縮フォーマットでは outWriteSize よりも小さい値になります。
+					現在のファイルポインタに outReadSize の値を足した値が、次回の読み込み位置となります。
+					この関数はスレッドセーフです。
+	*/
+	virtual void Read(uint32_t seekPos, void* buffer, uint32_t bufferSize, uint32_t* outReadSize, uint32_t* outWriteSize) = 0;
 
 	/// ファイルポインタ移動 (先頭からのバイトオフセット)
 	/// (このクラスで実装している read() と seek() は getOnmemoryPCMBuffer() に読み込んでいる事が前提)

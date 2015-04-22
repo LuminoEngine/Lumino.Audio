@@ -52,16 +52,25 @@ public:
 	/// デバイスクラスの取得
 	AudioDevice* GetAudioDevice() { return m_audioDevice; }
 
+private:
+	friend class Sound;
+	AudioStream* CreateAudioStream(const TCHAR* filePath);
+	AudioStream* CreateAudioStream(Stream* stream, const CacheKey& key);
+	AudioPlayer* CreateAudioPlayer(AudioStream* stream, SoundPlayType type, bool enable3D);		// 初期化完了済みの AudioStream を渡すこと
+	Sound* CreateSound(Stream* stream, SoundPlayType type, bool enable3D, const CacheKey& key);
+
+
+
 	/// キーに対応するオーディオソースを検索する (見つかった場合は addRef して返す)
 	//AudioStream* FindAudioSource(lnSharingKey key);
 
 	/// オーディオソースの作成 TODO:internal へ
-	AudioStream* CreateAudioStream(const TCHAR* filePath);
-	AudioStream* CreateAudioStream(Stream* stream, const CacheKey& key);
+	//AudioStream* CreateAudioStream(const TCHAR* filePath);
+	//AudioStream* CreateAudioStream(Stream* stream, const CacheKey& key);
 
-	AudioPlayer* CreateAudioPlayer(AudioStream* stream, SoundPlayType type, bool enable3D);
+	//AudioPlayer* CreateAudioPlayer(AudioStream* stream, SoundPlayType type, bool enable3D);
 
-	Sound* CreateSound(AudioStream* stream, SoundPlayType type, bool enable3D);
+	//
 
 	///// Sound の作成 ( stream_ = NULL でキーを使った検索だけ行う )
 	//Sound* createSound(FileIO::Stream* stream, SoundPlayType type, bool enable_3d, lnSharingKey key);
@@ -88,6 +97,8 @@ private:
 	GameAudio*		mGameAudio;
 	uint32_t		mOnMemoryLimitSize;
 	Threading::Mutex	m_resourceMutex;
+
+	CacheManager*				m_audioStreamCache;
 
 	ArrayList<Sound*>			m_soundList;
 	Threading::Mutex			m_soundListMutex;

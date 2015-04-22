@@ -1,7 +1,7 @@
 
 #include <Lumino/Base/Exception.h>
 #include <Lumino/IO/BinaryReader.h>
-#include "MidiStream.h"
+#include "MidiDecoder.h"
 
 namespace Lumino
 {
@@ -9,13 +9,13 @@ namespace Audio
 {
 
 //=============================================================================
-// MidiStream
+// MidiDecoder
 //=============================================================================
 	
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-MidiStream::MidiStream()
+MidiDecoder::MidiDecoder()
 	: m_stream(NULL)
 	, m_midiFileData()
 	, m_mutex()
@@ -29,7 +29,7 @@ MidiStream::MidiStream()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-MidiStream::~MidiStream()
+MidiDecoder::~MidiDecoder()
 {
 	LN_SAFE_RELEASE(m_stream);
 }
@@ -37,20 +37,18 @@ MidiStream::~MidiStream()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MidiStream::Create(Stream* stream)
+void MidiDecoder::Create(Stream* stream)
 {
 	LN_REFOBJ_SET(m_stream, stream);
 	m_volumeEntryList.Clear();
 
 	SearchData();
-
-	OnCreateFinished(NULL);
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MidiStream::GetLoopState(uint32_t* cc111time, uint32_t* base_time) const
+void MidiDecoder::GetLoopState(uint32_t* cc111time, uint32_t* base_time) const
 {
 	*cc111time = m_cc111Time;
 	*base_time = m_baseTime;
@@ -59,7 +57,7 @@ void MidiStream::GetLoopState(uint32_t* cc111time, uint32_t* base_time) const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MidiStream::FillOnmemoryBuffer()
+void MidiDecoder::FillOnmemoryBuffer()
 {
 	Threading::MutexScopedLock lock(m_mutex);
 
@@ -93,7 +91,7 @@ void MidiStream::FillOnmemoryBuffer()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MidiStream::Read(uint32_t seekPos, void* buffer, uint32_t bufferSize, uint32_t* outReadSize, uint32_t* outWriteSize)
+void MidiDecoder::Read(uint32_t seekPos, void* buffer, uint32_t bufferSize, uint32_t* outReadSize, uint32_t* outWriteSize)
 {
 	LN_THROW(0, InvalidOperationException);
 }
@@ -101,14 +99,14 @@ void MidiStream::Read(uint32_t seekPos, void* buffer, uint32_t bufferSize, uint3
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MidiStream::Reset()
+void MidiDecoder::Reset()
 {
 	LN_THROW(0, InvalidOperationException);
 }
 //----------------------------------------------------------------------
 //
 //----------------------------------------------------------------------
-void MidiStream::SearchData()
+void MidiDecoder::SearchData()
 {
 	// ファイルポインタを先頭に戻しておく
 	m_stream->Seek(0, SeekOrigin_Begin);
@@ -144,7 +142,7 @@ void MidiStream::SearchData()
 //----------------------------------------------------------------------
 //
 //----------------------------------------------------------------------
-uint32_t MidiStream::ReadDelta(BinaryReader& reader)
+uint32_t MidiDecoder::ReadDelta(BinaryReader& reader)
 {
 	uint8_t t;
 	uint32_t dtime = 0;
@@ -162,7 +160,7 @@ uint32_t MidiStream::ReadDelta(BinaryReader& reader)
 //----------------------------------------------------------------------
 //
 //----------------------------------------------------------------------
-bool MidiStream::SearchTrack(BinaryReader& reader, uint32_t* cc111_time)
+bool MidiDecoder::SearchTrack(BinaryReader& reader, uint32_t* cc111_time)
 {
 	// トラックチャンクのチェック
 	uint8_t chunk[4];

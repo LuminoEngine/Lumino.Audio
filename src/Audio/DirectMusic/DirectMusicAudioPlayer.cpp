@@ -17,7 +17,7 @@ namespace Audio
 //-----------------------------------------------------------------------------
 DirectMusicAudioPlayer::DirectMusicAudioPlayer( AudioDevice* manager )
 	: AudioPlayer(manager)
-	, m_midiStream(NULL)
+	, m_midiDecoder(NULL)
 	, m_segment(NULL)
 	, m_pauseTime(0)
 {
@@ -43,19 +43,19 @@ DirectMusicAudioPlayer::~DirectMusicAudioPlayer()
 //-----------------------------------------------------------------------------
 void DirectMusicAudioPlayer::Initialize(AudioStream* audioStream, bool enable3d)
 {
-	m_midiStream = dynamic_cast<MidiStream*>(audioStream);
-	LN_THROW(m_midiStream != NULL, ArgumentException);
+	m_midiDecoder = dynamic_cast<MidiDecoder*>(audioStream->GetDecoder());
+	LN_THROW(m_midiDecoder != NULL, ArgumentException);
 
-	AudioPlayer::Initialize(m_midiStream, enable3d);
+	AudioPlayer::Initialize(audioStream, enable3d);
 
 	// オンメモリ再生用に内部に持ってるバッファを埋める
-	m_midiStream->FillOnmemoryBuffer();
+	m_midiDecoder->FillOnmemoryBuffer();
 
 	if (DirectMusicManager::GetInstance()->IsInitialized() && !m_segment)
 	{
 		m_segment = LN_NEW DirectMusicSegment(
 			DirectMusicManager::GetInstance()->CreateDMPerformance(),
-			m_midiStream);
+			m_midiDecoder);
 	}
 }
 
@@ -119,7 +119,7 @@ void DirectMusicAudioPlayer::play()
 	{
 		uint32_t cc111time;
 		uint32_t base_time;
-		m_midiStream->GetLoopState(&cc111time, &base_time);
+		m_midiDecoder->GetLoopState(&cc111time, &base_time);
 
 		mLoopBegin = cc111time * LN_MUSIC_TIME_BASE / base_time;
 		mLoopLength = 0;
@@ -213,7 +213,7 @@ uint32_t DirectMusicAudioPlayer::getTotalTime() const
 //-----------------------------------------------------------------------------
 void DirectMusicAudioPlayer::onFinishDMInit(IDirectMusicPerformance8* dmPerformance)
 {
-	m_segment = LN_NEW DirectMusicSegment(dmPerformance, m_midiStream);
+	m_segment = LN_NEW DirectMusicSegment(dmPerformance, m_midiDecoder);
 
 	// 初期化中に設定されたパラメータを再設定する
 	SetVolume(static_cast< int >(mVolume));
@@ -225,7 +225,7 @@ void DirectMusicAudioPlayer::onFinishDMInit(IDirectMusicPerformance8* dmPerforma
 	{
 		uint32_t cc111time;
 		uint32_t base_time;
-		m_midiStream->GetLoopState(&cc111time, &base_time);
+		m_midiDecoder->GetLoopState(&cc111time, &base_time);
 
 		mLoopBegin = cc111time * LN_MUSIC_TIME_BASE / base_time;
 		mLoopLength = 0;
@@ -247,7 +247,7 @@ void DirectMusicAudioPlayer::_play()
 	{
 		m_segment = LN_NEW DirectMusicSegment(
 			DirectMusicManager::GetInstance()->CreateDMPerformance(),
-			m_midiStream);
+			m_midiDecoder);
 
 		// ちなみに setAudioSource() で作成するのはダメ。
 		// DirectMusic の初期化中に setAudioSource() が呼ばれた場合はもちろん m_segment = NULL だけど、

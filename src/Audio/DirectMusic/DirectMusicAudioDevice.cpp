@@ -1,6 +1,6 @@
 ﻿
 #include "../Internal.h"
-#include "../MidiStream.h"
+#include "../MidiDecoder.h"
 #include "DirectMusic.h"
 #include "DirectMusicAudioPlayer.h"
 #include "DirectMusicAudioDevice.h"

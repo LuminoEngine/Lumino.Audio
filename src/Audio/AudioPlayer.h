@@ -16,6 +16,7 @@ namespace Audio
 {
 class AudioDevice;
 class AudioStream;
+class AudioDecoder;
 
 /// AudioPlayer
 class AudioPlayer
@@ -80,6 +81,7 @@ public:
 protected:
 	AudioDevice*		mDevice;
 	AudioStream*		m_audioStream;
+	AudioDecoder*		m_decoder;
     int				    mVolume;		///< 音量 ( 0 ～ 100 )
 	int				    mPitch;			///< ピッチ ( 50 ～ 200 )
 	uint32_t			mLoopBegin;		///< ループされる領域の最初のサンプル (Midi なら ミュージックタイム単位)

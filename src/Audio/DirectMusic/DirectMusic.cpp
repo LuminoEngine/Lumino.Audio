@@ -30,7 +30,7 @@ namespace Audio
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-DirectMusicSegment::DirectMusicSegment(IDirectMusicPerformance8* dmPerformance, MidiStream* midiStream)
+	DirectMusicSegment::DirectMusicSegment(IDirectMusicPerformance8* dmPerformance, MidiDecoder* midiStream)
 	: m_dmPerformance(dmPerformance)
 	, m_dmAudioPath(NULL)
 	, m_dmSegment(NULL)

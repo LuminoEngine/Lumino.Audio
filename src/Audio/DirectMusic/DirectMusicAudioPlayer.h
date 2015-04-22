@@ -59,7 +59,7 @@ private:
 
 private:
 	//AudioDevice*		m_device;		///< 管理クラス
-	MidiStream*			m_midiStream;	///< Midi* にキャストした AudioPlayerBase::mAudioSource
+	MidiDecoder*		m_midiDecoder;	///< MidiDecoder* にキャストした AudioDecoder
     DirectMusicSegment*	m_segment;		///< DirectMusic の再生管理
     uint32_t			m_pauseTime;
 };

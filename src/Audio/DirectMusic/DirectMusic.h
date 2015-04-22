@@ -3,7 +3,7 @@
 
 #include <list>
 #include <Lumino/Threading/Thread.h>
-#include "../MidiStream.h"
+#include "../MidiDecoder.h"
 #include "lndmusic.h"
 
 namespace Lumino
@@ -26,7 +26,7 @@ class DirectMusicSegment
 {
 public:
 	/// (midiStream は保持しないため、参照カウントは変化させません。ただし、コンストラクタに渡す前に fillBuffer() を呼んでおく必要があります)
-	DirectMusicSegment(IDirectMusicPerformance8* dmPerformance, MidiStream* midiStream);
+	DirectMusicSegment(IDirectMusicPerformance8* dmPerformance, MidiDecoder* midiStream);
 	virtual ~DirectMusicSegment();
 
 public:
