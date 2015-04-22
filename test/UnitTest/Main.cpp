@@ -36,6 +36,20 @@ int main()
 	sound->Play();
 #endif
 
+#if 0
+	uint64_t st = Environment::GetTickCount();
+	RefPtr<FileStream> stream(LN_NEW FileStream(_T("D:/MMD/オーディオ/ZIGG-ZAGG.wav"), FileOpenMode_Read/* | FileOpenMode_Deferring*/));
+	
+	RefPtr<Sound> sound(manager->CreateSound(stream, SoundPlayType_Unknown, false, CacheKey::Null));
+#endif
+	//RefPtr<Sound> sound(Sound::Create(LOCALFILE("Audio/TestData/UnitTest1.mid")));
+	RefPtr<Sound> sound(Sound::Create(_T("D:/tmp/ln21.mid")));
+	sound->SetPitch(110);
+	sound->SetLoopEnabled(true);
+	sound->Play();
+
+	//printf("t:%llu\n", Environment::GetTickCount() - st);
+
 	getchar();
 
 	//Platform::ApplicationSettings s;

@@ -22,6 +22,13 @@ class Sound
     : public RefObject
 {
 public:
+
+	/**
+		@brief		
+	*/
+	static Sound* Create(const TCHAR* filePath, SoundPlayType playerType = SoundPlayType_Unknown, bool enable3D = false, AudioManager* manager = NULL);
+
+public:
 	
 	/**
 		@brief		この音声の音量を設定します。

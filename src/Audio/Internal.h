@@ -17,3 +17,18 @@
 #endif
 
 #define LN_CLAMP(value, minValue, maxValue)		(value > maxValue) ? maxValue : (value < minValue) ? minValue : value;
+
+namespace Lumino
+{
+namespace Audio
+{
+class AudioManager;
+
+class Internal
+{
+public:
+	static AudioManager* Manager;
+};
+
+}
+}

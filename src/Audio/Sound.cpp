@@ -1,6 +1,8 @@
 ﻿
 #include <Lumino/Audio/AudioManager.h>
 #include <Lumino/Audio/Sound.h>
+#include <Lumino/IO/FileStream.h>
+#include "Internal.h"
 #include "AudioStream.h"
 #include "AudioPlayer.h"
 
@@ -18,11 +20,22 @@ namespace Audio
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
+Sound* Sound::Create(const TCHAR* filePath, SoundPlayType playerType, bool enable3D, AudioManager* manager)
+{
+	manager = (manager) ? manager : Internal::Manager;
+
+	RefPtr<FileStream> stream(LN_NEW FileStream(filePath, FileOpenMode_Read | FileOpenMode_Deferring));
+	return manager->CreateSound(stream, playerType, enable3D, CacheKey(PathName(filePath)));
+}
+
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
 Sound::Sound(AudioManager* manager, AudioStream* stream, SoundPlayType playerType, bool is3DSound)
 	: m_manager(manager)
 	, m_audioStream(stream)
 	, m_audioPlayer(NULL)
-	, m_playerType(SoundPlayType_Unknown)
+	, m_playerType(playerType)
 	, m_volume(100)
 	, m_pitch(100)
 	, m_loopEnabled(false)

@@ -41,6 +41,8 @@ namespace Audio
 // AudioManager
 //=============================================================================
 
+AudioManager* Internal::Manager = NULL;
+
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
@@ -86,6 +88,8 @@ AudioManager::AudioManager(const ConfigData& configData)
 
 	// ポーリングスレッド開始
 	m_pollingThread.Start(LN_CreateDelegate(this, &AudioManager::Thread_Polling));
+
+	Internal::Manager = this;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,6 +113,10 @@ AudioManager::~AudioManager()
 	}
 	LN_SAFE_RELEASE(m_audioDevice);
 	LN_SAFE_RELEASE(m_midiAudioDevice);
+
+	if (Internal::Manager == this) {
+		Internal::Manager = NULL;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +155,9 @@ AudioStream* AudioManager::CreateAudioStream(Stream* stream, const CacheKey& key
 		*/
 
 		// キャッシュに登録
-		m_audioStreamCache->RegisterCacheObject(key, audioStream);
+		if (!key.IsNull()) {
+			m_audioStreamCache->RegisterCacheObject(key, audioStream);
+		}
 	}
 
 	audioStream.SafeAddRef();
