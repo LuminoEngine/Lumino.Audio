@@ -71,13 +71,6 @@ public:
 	///	Midi ファイルの場合は最初の CC111 位置のデルタタイムとベースタイム
 	virtual void GetLoopState(uint32_t* begin, uint32_t* length) const = 0;
 
-	/// オーディオファイルとして扱うストリームを設定する
-	///
-	///	受け取ったストリームは参照カウントがひとつ増え、
-	///	インスタンスが解放されるか fillBuffer() が呼ばれるまで保持されます。
-	//virtual void setStream(Stream* stream) = 0;
-
-
 	/// オンメモリ再生用に全てのデータを読み込む
 	///
 	/// デコード後の PCM データサイズ分のバッファを内部で確保し、
@@ -126,24 +119,6 @@ public:
 
 	/// デコード状態のリセット(再生開始直前に呼ばれる。MP3 用)
 	virtual void Reset() = 0;
-
-
-
-	///// fillBufferAndReleaseStream() スレッドセーフ
-	//virtual void fillBufferSafe()
-	//{
-	//	// TODO: fillBufferAndReleaseStream() を直接読んでるところないかチェック
-	//	Threading::ScopedLock lock(mMutex);
-	//	this->fillBufferAndReleaseStream();
-	//}
-
-	///// seek + reed + スレッドセーフ
-	//virtual void readSafe(void* buffer, uint32_t buffer_size, uint32_t offset, uint32_t* read_size, uint32_t* write_size)
-	//{
-	//	Threading::ScopedLock lock(mMutex);
-	//	this->seek(offset);
-	//	this->read(buffer, buffer_size, read_size, write_size);
-	//}
 
 private:
 	Exception*	m_exception;

@@ -60,7 +60,7 @@ void Sound::SetVolume(int volume)
 {
 	m_volume = volume;
 	if (m_audioPlayer != NULL) {
-		m_audioPlayer->setVolume(m_volume);
+		m_audioPlayer->SetVolume(m_volume);
 	}
 }
 
@@ -79,7 +79,7 @@ void Sound::SetPitch(int pitch)
 {
 	m_pitch = pitch;
 	if (m_audioPlayer != NULL) {
-		m_audioPlayer->setPitch(m_pitch);
+		m_audioPlayer->SetPitch(m_pitch);
 	}
 }
 
@@ -272,8 +272,8 @@ void Sound::Polling(float elapsedTime)
 	if (m_audioPlayer == NULL && m_audioStream->CheckCreated())
 	{
 		m_audioPlayer = m_manager->CreateAudioPlayer(m_audioStream, m_playerType, m_is3DSound);
-		m_audioPlayer->setVolume(m_volume);
-		m_audioPlayer->setPitch(m_pitch);
+		m_audioPlayer->SetVolume(m_volume);
+		m_audioPlayer->SetPitch(m_pitch);
 		m_audioPlayer->loop(m_loopEnabled);
 		m_audioPlayer->setLoopState(m_loopBegin, m_loopLength);
 		m_audioPlayer->setPosition(m_position);

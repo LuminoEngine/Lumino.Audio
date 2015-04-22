@@ -54,8 +54,8 @@ public:
 
 public:
 	virtual void		Initialize(AudioStream* audioStream, bool enable3d);
-	virtual void		setVolume( int volume );
-	virtual void		setPitch( int pitch );
+	virtual void		SetVolume( int volume );
+	virtual void		SetPitch( int pitch );
     virtual uint64_t	getPlayedSamples() const;
 	virtual void		play();
 	virtual void		stop();
@@ -85,8 +85,8 @@ public:
 
 public:
 	virtual void		Initialize(AudioStream* audioStream, bool enable3d);
-	virtual void		setVolume( int volume );
-	virtual void		setPitch( int pitch );
+	virtual void		SetVolume( int volume );
+	virtual void		SetPitch( int pitch );
 	virtual uint64_t	getPlayedSamples() const;
 	virtual void		play();
 	virtual void		stop();

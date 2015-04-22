@@ -31,9 +31,9 @@ public:
 
 public:
 	virtual AudioStream*		GetAudioStream() const { return m_audioStream; }
-    virtual void				setVolume( int volume );
+    virtual void				SetVolume( int volume );
     virtual int					getVolume() const { return static_cast< int >( mVolume ); }
-    virtual void				setPitch( int pitch );
+    virtual void				SetPitch( int pitch );
 	virtual int					getPitch() const { return static_cast< int >( mPitch ); }
 	virtual void				setLoopState(uint32_t loop_begin, uint32_t loop_length);
     virtual bool				isPlaying() const { return mIsPlaying; }

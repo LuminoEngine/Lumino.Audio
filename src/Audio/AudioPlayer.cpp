@@ -1,4 +1,5 @@
 ﻿
+#include "Internal.h"
 #include <Lumino/Base/Exception.h>
 #include <Lumino/Math/MathUtils.h>
 #include "AudioStream.h"
@@ -20,8 +21,8 @@ namespace Audio
 AudioPlayer::AudioPlayer(AudioDevice* device)
 	: mDevice(device)
 	, m_audioStream(NULL)
-	, mVolume(100.f)
-	, mPitch(100.f)
+	, mVolume(100)
+	, mPitch(100)
 	, mLoopBegin(0)
 	, mLoopLength(0)
 	, mIsPlaying(false)
@@ -58,19 +59,19 @@ void AudioPlayer::Initialize(AudioStream* audioStream, bool enable3d)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void AudioPlayer::setVolume( int volume )
+void AudioPlayer::SetVolume( int volume )
 {
-    mVolume = static_cast< float >( volume );
-    mVolume = Math::Clamp( mVolume, 0.0f, 100.0f );
+    mVolume = volume;
+	mVolume = LN_CLAMP(mVolume, 0, 100);
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void AudioPlayer::setPitch( int pitch )
+void AudioPlayer::SetPitch( int pitch )
 {
-	mPitch = static_cast< float >( pitch );
-	mPitch = Math::Clamp(mPitch, 50.0f, 200.0f);
+	mPitch = pitch;
+	mPitch = LN_CLAMP(mPitch, 50, 200);
 }
 
 //-----------------------------------------------------------------------------

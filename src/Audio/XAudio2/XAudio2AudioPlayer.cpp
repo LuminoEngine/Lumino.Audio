@@ -112,24 +112,24 @@ void XAudio2OnMemoryAudioPlayer::Initialize(AudioStream* audioStream, bool enabl
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void XAudio2OnMemoryAudioPlayer::setVolume( int volume )
+void XAudio2OnMemoryAudioPlayer::SetVolume( int volume )
 {
-    XAudio2AudioPlayerBase::setVolume( volume );
+    XAudio2AudioPlayerBase::SetVolume( volume );
     if ( mSourceVoice )
 	{
-		LN_COMCALL(mSourceVoice->SetVolume(mVolume * 0.01f));
+		LN_COMCALL(mSourceVoice->SetVolume(0.01f * mVolume));
 	}
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void XAudio2OnMemoryAudioPlayer::setPitch( int pitch )
+void XAudio2OnMemoryAudioPlayer::SetPitch( int pitch )
 {
-    XAudio2AudioPlayerBase::setPitch( pitch );
+    XAudio2AudioPlayerBase::SetPitch( pitch );
     if ( mSourceVoice )
 	{
-		LN_COMCALL(mSourceVoice->SetFrequencyRatio(mPitch * 0.01f));
+		LN_COMCALL(mSourceVoice->SetFrequencyRatio(0.01f * mPitch));
 	}
 }
 
@@ -338,24 +338,24 @@ void XAudio2StreamingAudioPlayer::Initialize(AudioStream* audioStream, bool enab
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void XAudio2StreamingAudioPlayer::setVolume( int volume )
+void XAudio2StreamingAudioPlayer::SetVolume( int volume )
 {
-    XAudio2AudioPlayerBase::setVolume( volume );
+    XAudio2AudioPlayerBase::SetVolume( volume );
     if ( mSourceVoice )
 	{
-		LN_COMCALL(mSourceVoice->SetVolume(mVolume * 0.01f));\
+		LN_COMCALL(mSourceVoice->SetVolume(0.01f * mVolume));
 	}
 }
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void XAudio2StreamingAudioPlayer::setPitch( int pitch )
+void XAudio2StreamingAudioPlayer::SetPitch(int pitch)
 {
-    XAudio2AudioPlayerBase::setPitch( pitch );
+	XAudio2AudioPlayerBase::SetPitch(pitch);
     if ( mSourceVoice )
 	{
-		LN_COMCALL(mSourceVoice->SetFrequencyRatio(mPitch * 0.01f));\
+		LN_COMCALL(mSourceVoice->SetFrequencyRatio(0.01f * mPitch));
 	}
 }
 

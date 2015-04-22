@@ -62,9 +62,9 @@ void DirectMusicAudioPlayer::Initialize(AudioStream* audioStream, bool enable3d)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void DirectMusicAudioPlayer::setVolume(int volume)
+void DirectMusicAudioPlayer::SetVolume(int volume)
 {
-	AudioPlayer::setVolume(volume);
+	AudioPlayer::SetVolume(volume);
 	if (m_segment) {
 		m_segment->SetVolume(mVolume);
 	}
@@ -73,9 +73,9 @@ void DirectMusicAudioPlayer::setVolume(int volume)
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void DirectMusicAudioPlayer::setPitch(int pitch)
+void DirectMusicAudioPlayer::SetPitch(int pitch)
 {
-	AudioPlayer::setPitch(pitch);
+	AudioPlayer::SetPitch(pitch);
 	if (m_segment) {
 		m_segment->SetPitch(mPitch);
 	}
@@ -216,8 +216,8 @@ void DirectMusicAudioPlayer::onFinishDMInit(IDirectMusicPerformance8* dmPerforma
 	m_segment = LN_NEW DirectMusicSegment(dmPerformance, m_midiStream);
 
 	// 初期化中に設定されたパラメータを再設定する
-	setVolume(static_cast< int >(mVolume));
-	setPitch(static_cast< int >(mPitch));
+	SetVolume(static_cast< int >(mVolume));
+	SetPitch(static_cast< int >(mPitch));
 
 	// 初期化完了前にユーザーによってループ位置が設定されていなければ
 	// CC111 を目印とした位置に設定する

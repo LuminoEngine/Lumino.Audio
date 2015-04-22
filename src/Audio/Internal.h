@@ -12,3 +12,5 @@
 	#include <x3daudio.h>
 	#include <d3dx9math.h>
 #endif
+
+#define LN_CLAMP(value, minValue, maxValue)		(value > maxValue) ? maxValue : (value < minValue) ? minValue : value;

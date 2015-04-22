@@ -139,19 +139,35 @@ set(LN_SOURCES
 	external/libvorbis/lib/vorbisenc.c
 	external/libvorbis/lib/vorbisfile.c
 	external/libvorbis/lib/window.c
+	include/LuminoAudio.h
+	include/Lumino/Audio/AudioManager.h
+	include/Lumino/Audio/Common.h
+	include/Lumino/Audio/Sound.h
 	src/Audio/AudioDevice.cpp
+	src/Audio/AudioDevice.h
 	src/Audio/AudioManager.cpp
 	src/Audio/AudioPlayer.cpp
-	src/Audio/AudioUtils.cpp
+	src/Audio/AudioPlayer.h
 	src/Audio/AudioStream.cpp
+	src/Audio/AudioStream.h
+	src/Audio/AudioUtils.cpp
+	src/Audio/AudioUtils.h
+	src/Audio/Internal.h
 	src/Audio/MidiStream.cpp
+	src/Audio/MidiStream.h
 	src/Audio/Sound.cpp
 	src/Audio/WaveStream.cpp
+	src/Audio/WaveStream.h
 	src/Audio/XAudio2/XAudio2AudioDevice.cpp
+	src/Audio/XAudio2/XAudio2AudioDevice.h
 	src/Audio/XAudio2/XAudio2AudioPlayer.cpp
+	src/Audio/XAudio2/XAudio2AudioPlayer.h
 	src/Audio/DirectMusic/DirectMusic.cpp
+	src/Audio/DirectMusic/DirectMusic.h
 	src/Audio/DirectMusic/DirectMusicAudioDevice.cpp
+	src/Audio/DirectMusic/DirectMusicAudioDevice.h
 	src/Audio/DirectMusic/DirectMusicAudioPlayer.cpp
+	src/Audio/DirectMusic/DirectMusicAudioPlayer.h
 	${LN_PLATFORM_SOURCES})
 	
 set(LN_INCLUDE_DIRECTORIES
