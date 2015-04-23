@@ -157,6 +157,8 @@ set(LN_SOURCES
 	src/Audio/MidiDecoder.h
 	src/Audio/Mp3Decoder.cpp
 	src/Audio/Mp3Decoder.h
+	src/Audio/OggDecoder.cpp
+	src/Audio/OggDecoder.h
 	src/Audio/Sound.cpp
 	src/Audio/WaveDecoder.cpp
 	src/Audio/WaveDecoder.h
