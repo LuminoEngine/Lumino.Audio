@@ -2,6 +2,7 @@
 #include "Internal.h"
 #include "AudioStream.h"
 #include "WaveDecoder.h"
+#include "OggDecoder.h"
 #include "Mp3Decoder.h"
 #include "MidiDecoder.h"
 #include "AudioUtils.h"
@@ -67,10 +68,10 @@ void AudioStream::OnASyncIOProc()
 		m_decoder = LN_NEW Mp3Decoder();
 		break;
 #endif
-	//		// OGG
-		//	case AUDIOSOURCE_OGG:
-		//		audio_source.attach(LN_NEW Ogg(this), false);
-		//		break;
+		// OGG
+	case StreamFormat_Ogg:
+		m_decoder = LN_NEW OggDecoder();
+		break;
 		// MIDI
 	case StreamFormat_Midi:
 		m_decoder = LN_NEW MidiDecoder();

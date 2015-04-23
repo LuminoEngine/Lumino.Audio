@@ -7,6 +7,9 @@ using namespace Lumino::Audio;
 //#pragma comment(lib, "dinput8.lib")
 int main()
 {
+#ifdef _WIN32
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 	//FileManager::
 
 	
@@ -42,15 +45,17 @@ int main()
 	
 	RefPtr<Sound> sound(manager->CreateSound(stream, SoundPlayType_Unknown, false, CacheKey::Null));
 #endif
-	//RefPtr<Sound> sound(Sound::Create(LOCALFILE("Audio/TestData/UnitTest1.mid")));
-	RefPtr<Sound> sound(Sound::Create(_T("D:/tmp/ln21.mid")));
-	sound->SetPitch(110);
-	sound->SetLoopEnabled(true);
-	sound->Play();
+	RefPtr<Sound> sound(Sound::Create(LOCALFILE("Audio/TestData/UnitTest1.mid")));
+	//RefPtr<Sound> sound(Sound::Create(_T("D:/tmp/ln21.mid")));
+	//RefPtr<Sound> sound(Sound::Create(_T("D:/Proj/LightNote/LightNote/Samples/Media/ln22.ogg")));
+	//sound->SetPitch(110);
+	//sound->SetLoopEnabled(true);
+	//sound->Play();
 
 	//printf("t:%llu\n", Environment::GetTickCount() - st);
 
 	getchar();
+	manager->Finalize();
 
 	//Platform::ApplicationSettings s;
 	//Platform::Application app(s);

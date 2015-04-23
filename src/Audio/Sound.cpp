@@ -62,6 +62,7 @@ Sound::Sound(AudioManager* manager, AudioStream* stream, SoundPlayType playerTyp
 //-----------------------------------------------------------------------------
 Sound::~Sound()
 {
+	LN_SAFE_RELEASE(m_audioStream);
 	LN_SAFE_RELEASE(m_audioPlayer);
 	LN_SAFE_RELEASE(m_manager);
 }
